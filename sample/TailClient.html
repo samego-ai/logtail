@@ -9,18 +9,18 @@
   <!--控制管理-->
   <div class="controller" style="margin: 5px 8px">
     <label for="namespace"></label><input id="namespace" value="demo" placeholder="请输入容器部署名称...">
-    <input type="button" value="发送数据" onclick="send()">
-    <input type="button" value="关闭通讯" onclick="stop()">
+    <input type="button" value="发送数据" id="send">
+    <input type="button" value="关闭通讯" id="close">
   </div>
 
   <!--内容渲染-->
-  <div class="content">
-    <div id="main" style="width:100%;height: 600px; overflow: auto;border: 1px dashed black;"></div>
+  <div id="content" style="width:100%;height: 600px; overflow: auto;border: 1px dashed black; padding: 5px">
   </div>
 </div>
 
 <script type="text/javascript">
-  const ws = new WebSocket("ws://127.0.0.1:80/broadcast/logtail");
+  // let ws = new WebSocket("ws://127.0.0.1:80/broadcast/logtail");
+  let ws = new WebSocket("ws://127.0.0.1:1280");
 
   if (!ws.connected) {
     ws.onopen = function () {
@@ -29,15 +29,17 @@
   }
 
   ws.onmessage = function (evt) {
-    document.getElementById("#main").append("<p>" + evt.data + "</p>")
+    if (evt.data) {
+      document.getElementById("content").append(evt.data)
+    }
   };
 
-  function send() {
-    ws.send(document.getElementById('textarea').value);
+  document.getElementById("send").onclick = function () {
+    ws.send(document.getElementById('namespace').value);
   }
 
-  function stop() {
-    ws.close();
+  document.getElementById("close").onclick = function () {
+    ws.close()
   }
 
   ws.onclose = function () {

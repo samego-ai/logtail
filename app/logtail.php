@@ -1,4 +1,7 @@
+#!/usr/bin/env php
 <?php
+
+declare(strict_types=1);
 
 /*
  * What SameGo team is that is 'one thing, a team, work together'
@@ -9,7 +12,7 @@
 $config = parse_ini_file(__DIR__ . '/../config/' . 'env.ini', true);
 
 // 2.create websocket server
-$server = new swoole_websocket_server($config['server']['host'], $config['server']['port']);
+$server = new swoole_websocket_server($config['server']['host'], (int)$config['server']['port']);
 
 // open callback function
 $server->on(

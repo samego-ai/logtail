@@ -1,4 +1,7 @@
-FROM alicfeng/ai_xr_tail:base
+FROM swooleinc/swoole
 
-COPY app /var/www/
-COPY config /var/www/
+COPY . /var/www/
+
+EXPOSE 1280
+
+CMD ["/usr/local/bin/php","/var/www/app/logtail.php"]
