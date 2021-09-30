@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LogTail</title>
+</head>
+<body>
+<div class="container">
+  <!--控制管理-->
+  <div class="controller" style="margin: 5px 8px">
+    <label for="namespace"></label><input id="namespace" value="demo" placeholder="请输入容器部署名称...">
+    <input type="button" value="发送数据" onclick="send()">
+    <input type="button" value="关闭通讯" onclick="stop()">
+  </div>
+
+  <!--内容渲染-->
+  <div class="content">
+    <div id="main" style="width:100%;height: 600px; overflow: auto;border: 1px dashed black;"></div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  const ws = new WebSocket("ws://127.0.0.1:80/broadcast/logtail");
+
+  if (!ws.connected) {
+    ws.onopen = function () {
+      console.log("websocket connect successful");
+    };
+  }
+
+  ws.onmessage = function (evt) {
+    document.getElementById("#main").append("<p>" + evt.data + "</p>")
+  };
+
+  function send() {
+    ws.send(document.getElementById('textarea').value);
+  }
+
+  function stop() {
+    ws.close();
+  }
+
+  ws.onclose = function () {
+    console.log("websocket closed ...");
+  };
+
+  window.onbeforeunload = function (event) {
+    console.log("websocket beforeunload");
+    ws.close();
+  }
+</script>
+</body>
+</html>
