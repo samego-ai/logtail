@@ -87,16 +87,17 @@ $server->on(
 
             // 读取增量内容
             if ($log_content = fread($fp, $add_size)) {
-                $log_content = nl2br($log_content);
-                $server->push($frame->fd, $log_content);
+                if ($log_content = nl2br($log_content)) {
+                    $server->push($frame->fd, $log_content);
+                }
             }
 
             // 文件seek指针移位
             fseek($fp, $file_size + $add_size);
             $file_size = $file_current_size;
 
-            // 时间间隔为1秒
-            sleep(1);
+            // 时间间隔为500毫秒
+            usleep(500);
         }
         fclose($fp);
 
