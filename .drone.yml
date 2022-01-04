@@ -1,0 +1,52 @@
+kind: pipeline
+name: LogtailService
+type: docker
+
+clone:
+  disable: true
+
+steps:
+  - name: 克隆源码
+    image: drone/git
+
+  - name: 构建镜像
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: DOCKER_USERNAME
+      password:
+        from_secret: DOCKER_PASSWORD
+      repo: registry-vpc.cn-shenzhen.aliyuncs.com/tq_application/logtail_service
+      registry: registry-vpc.cn-shenzhen.aliyuncs.com
+      insecure: true
+      purge: false
+      tags: ${DRONE_BUILD_NUMBER}
+
+  - name: 服务部署
+    image: quay.io/honestbee/drone-kubernetes
+    settings:
+      kubernetes_server:
+        from_secret: KUBERNETES_SERVER
+      kubernetes_token:
+        from_secret: KUBERNETES_TOKEN
+      namespace:
+        from_secret: KUBERNETES_NAMESPACE
+      deployment: logtail
+      container: main
+      repo: registry.cn-shenzhen.aliyuncs.com/tq_application/logtail_service
+      tag: ${DRONE_BUILD_NUMBER}
+
+  - name: 邮件通知
+    image: drillster/drone-email
+    settings:
+      from:
+        from_secret: NOTIFY_EMAIL_FROM
+      host:
+        from_secret: NOTIFY_EMAIL_HOST
+      username:
+        from_secret: NOTIFY_EMAIL_USERNAME
+      password:
+        from_secret: NOTIFY_EMAIL_PASSWORD
+      port: 465
+      recipients:
+        - a@samego.com
